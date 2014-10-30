@@ -2,9 +2,9 @@ box: tcnksm/gox@0.1.0
 build:
   steps:
       - tcnksm/gox
-      - name: prepare
-        code: |
-            echo $WERCKER_GIT_COMMIT > $WERCKER_OUTPUT_DIR/HEAD
+      - script:
+          name: prepare
+          code: echo $WERCKER_GIT_COMMIT > $WERCKER_OUTPUT_DIR/HEAD
 deploy:
   steps:
     - s3sync:
