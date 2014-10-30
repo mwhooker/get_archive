@@ -7,7 +7,9 @@ build:
       - tcnksm/gox
       - script:
           name: prepare
-          code: echo $WERCKER_GIT_COMMIT > $WERCKER_OUTPUT_DIR/HEAD
+          code: |
+              echo $WERCKER_GIT_COMMIT > $WERCKER_OUTPUT_DIR/HEAD
+              mv $WERCKER_OUTPUT_DIR/pkg $WERCKER_OUTPUT_DIR/$WERCKER_GIT_COMMIT
 deploy:
   steps:
     - s3sync:
