@@ -49,12 +49,12 @@ func (dl *Downloader) getHead() (string, error) {
 	return strings.TrimSpace(string(data[:])), nil
 }
 
-func (dl *Downloader) GetLatest(destination string, platform string) error {
+func (dl *Downloader) GetLatest(destination string, suffix string) error {
 	head, err := dl.getHead()
 	if err != nil {
 		panic(err)
 	}
-	path := fmt.Sprintf("/%s/%s/%s/%s/build", dl.project, dl.branch, head, platform)
+	path := fmt.Sprintf("/%s/%s/%s/%s", dl.project, dl.branch, head, suffix)
 	log.Println(path)
 	data, err := dl.Bucket.Get(path)
 	if err != nil {
@@ -81,7 +81,7 @@ func main() {
 	var branch = flag.String("branch", "master", "Which branch of the build we want.")
 	// Project must follow our s3 scheme (see above)
 	var projectName = flag.String("project", "kiddie-pool", "Project we want to download.")
-	var platform = flag.String("platform", "darwin_amd64", "Platform the want to download for.")
+	var suffix = flag.String("suffix", "", "File name archive is stored as")
 	var destination = flag.String("destination", "", "The name to write the file to. If empty, use the name of the file in S3.")
 	var accessKey = flag.String("access-key", "", "AWS access key. Leave empty to get from environment.")
 	var secretKey = flag.String("secret-key", "", "AWS secret access key. Leave empty to get from environment.")
@@ -99,10 +99,15 @@ func main() {
 		}
 	}
 
+	if len(*suffix) == 0 {
+		log.Println("You need to provide a suffix. It's probably the name of the file you uploaded.")
+		return
+	}
+
 	dl := NewDownloader(&auth, *projectName, *environment, *branch)
 	if len(*destination) > 0 {
-		dl.GetLatest(*destination, *platform)
+		dl.GetLatest(*destination, *suffix)
 	} else {
-		dl.GetLatest(*projectName, *platform)
+		dl.GetLatest(*projectName, *suffix)
 	}
 }
