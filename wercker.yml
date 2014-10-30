@@ -2,10 +2,14 @@ box: tcnksm/gox@0.1.0
 build:
   steps:
       - tcnksm/gox
+      - name: prepare
+        code: |
+            echo $WERCKER_GIT_COMMIT > $WERCKER_OUTPUT_DIR/HEAD
 deploy:
   steps:
-    - s3archive:
+    - s3sync:
         key-id: $AWS_ACCESS_KEY_ID
         key-secret: $AWS_SECRET_ACCESS_KEY
-        bucket-url: $AWS_BUCKET_URL
-        source: "get_kp"
+        bucket-url: $AWS_BUCKET_URL/$WERCKER_GIT_BRANCH/
+        delete-removed: false
+        source-dir: "."
