@@ -1,0 +1,13 @@
+box: wercker-labs/docker
+build:
+  steps:
+      - script:
+          name: build
+          code: go build ./get_kp.go
+deploy:
+  steps:
+    - s3archive:
+        key-id: $AWS_ACCESS_KEY_ID
+        key-secret: $AWS_SECRET_ACCESS_KEY
+        bucket-url: $AWS_BUCKET_URL
+        source: "get_kp"
