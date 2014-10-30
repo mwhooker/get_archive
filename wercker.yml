@@ -1,6 +1,9 @@
 box: tcnksm/gox@0.1.0
 build:
   steps:
+      - script:
+          name: install
+          code: go install -v ./...
       - tcnksm/gox
       - script:
           name: prepare
