@@ -3,7 +3,7 @@ build:
   steps:
       - script:
           name: install
-          code: go install -v ./...
+          code: go get -v -d ./...
       - tcnksm/gox
       - script:
           name: prepare
