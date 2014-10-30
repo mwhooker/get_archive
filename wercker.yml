@@ -1,9 +1,7 @@
-box: wercker-labs/docker
+box: tcnksm/gox@0.1.0
 build:
   steps:
-      - script:
-          name: build
-          code: go build ./get_archive.go
+      - tcnksm/gox
 deploy:
   steps:
     - s3archive:
