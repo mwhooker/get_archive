@@ -18,13 +18,14 @@ a project must follow our s3 scheme
 bucket:
 	s3://wercker-{environment}/
 
-A file whose content is the "short-rev" of a git commit
+A file whose content is the hash of the latest git commit
 	/{project}/{branch}/HEAD
 
 The project file for a given commit on a given branch.
 Branch is redundant with commit, but we lay it out like this to make it easier on us humans.
-	/{project}/{branch}/{project}.{short-rev}.tgz
+	/{project}/{branch}/{git-hash}/{platform}/build
 */
+
 type Downloader struct {
 	Bucket  *s3.Bucket
 	branch  string
@@ -48,14 +49,12 @@ func (dl *Downloader) getHead() (string, error) {
 	return strings.TrimSpace(string(data[:])), nil
 }
 
-func (dl *Downloader) GetLatest(destination string) error {
-	// s3://wercker-development/kiddie-pool/master/
-	//wercker-development/kiddie-pool/docker/kiddie-pool.7d3bb37.tgz
+func (dl *Downloader) GetLatest(destination string, platform string) error {
 	head, err := dl.getHead()
 	if err != nil {
 		panic(err)
 	}
-	path := fmt.Sprintf("/%s/%s/%s.%s.tgz", dl.project, dl.branch, dl.project, head)
+	path := fmt.Sprintf("/%s/%s/%s/%s/build", dl.project, dl.branch, head, platform)
 	log.Println(path)
 	data, err := dl.Bucket.Get(path)
 	if err != nil {
@@ -82,6 +81,7 @@ func main() {
 	var branch = flag.String("branch", "master", "Which branch of the build we want.")
 	// Project must follow our s3 scheme (see above)
 	var projectName = flag.String("project", "kiddie-pool", "Project we want to download.")
+	var platform = flag.String("platform", "darwin_amd64", "Platform the want to download for.")
 	var destination = flag.String("destination", "", "The name to write the file to. If empty, use the name of the file in S3.")
 	var accessKey = flag.String("access-key", "", "AWS access key. Leave empty to get from environment.")
 	var secretKey = flag.String("secret-key", "", "AWS secret access key. Leave empty to get from environment.")
@@ -101,8 +101,8 @@ func main() {
 
 	dl := NewDownloader(&auth, *projectName, *environment, *branch)
 	if len(*destination) > 0 {
-		dl.GetLatest(*destination)
+		dl.GetLatest(*destination, *platform)
 	} else {
-		dl.GetLatest(*projectName)
+		dl.GetLatest(*projectName, *platform)
 	}
 }
