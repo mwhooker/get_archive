@@ -9,6 +9,7 @@ build:
           name: prepare
           code: |
               echo $WERCKER_GIT_COMMIT > $WERCKER_OUTPUT_DIR/HEAD
+              cp bootstrap.sh $WERCKER_OUTPUT_DIR/
               mv $WERCKER_OUTPUT_DIR/pkg $WERCKER_OUTPUT_DIR/$WERCKER_GIT_COMMIT
 deploy:
   steps:
