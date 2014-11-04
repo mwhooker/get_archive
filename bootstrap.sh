@@ -1,7 +1,7 @@
 #!/bin/bash
 
 environment="development"
-s3_url="http://wercker-${environment}"
+s3_url="http://wercker-${environment}.s3.amazonaws.com"
 head_location="${s3_url}/get_archive/master/HEAD"
 HEAD=$(/usr/bin/curl $head_location)
 app_location="${s3_url}/get_archive/master/${HEAD}/linux_amd64/build"
